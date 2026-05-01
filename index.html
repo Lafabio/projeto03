@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planejador de Aulas</title>
-    <link rel="stylesheet" href="stile.css">
+    <link rel="stylesheet" href="src/css/style.css">
 </head>
 <body>
     <!-- TELA DE LOGIN -->
@@ -16,16 +16,17 @@
             <form id="loginForm" onsubmit="event.preventDefault(); fazerLogin();">
                 <h2>Acessar Sistema</h2>
                 <div class="form-group">
-                    <label>Usuário:</label>
-                    <input type="text" id="loginUsuario" required>
+                    <label>Email:</label>
+                    <input type="email" id="loginEmail" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="position: relative;">
                     <label>Senha:</label>
                     <input type="password" id="loginSenha" required>
+                    <button type="button" onclick="toggleSenha('loginSenha')" style="position: absolute; right: 10px; top: 32px; background: none; border: none; cursor: pointer; font-size: 18px;">👁️</button>
                 </div>
                 <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
                     <input type="checkbox" id="lembrarUsuario" style="width: auto;">
-                    <label for="lembrarUsuario" style="margin: 0; font-weight: normal;">Lembrar usuário</label>
+                    <label for="lembrarUsuario" style="margin: 0; font-weight: normal;">Lembrar email</label>
                 </div>
                 <button type="submit" class="btn-login">Entrar</button>
                 <p style="text-align: center; margin-top: 15px;">
@@ -43,20 +44,18 @@
                     <input type="text" id="cadastroNome" required>
                 </div>
                 <div class="form-group">
-                    <label>Usuário:</label>
-                    <input type="text" id="cadastroUsuario" required>
-                </div>
-                <div class="form-group">
                     <label>Email:</label>
                     <input type="email" id="cadastroEmail" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="position: relative;">
                     <label>Senha:</label>
                     <input type="password" id="cadastroSenha" required>
+                    <button type="button" onclick="toggleSenha('cadastroSenha')" style="position: absolute; right: 10px; top: 32px; background: none; border: none; cursor: pointer; font-size: 18px;">👁️</button>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="position: relative;">
                     <label>Confirmar senha:</label>
                     <input type="password" id="cadastroConfirmarSenha" required>
+                    <button type="button" onclick="toggleSenha('cadastroConfirmarSenha')" style="position: absolute; right: 10px; top: 32px; background: none; border: none; cursor: pointer; font-size: 18px;">👁️</button>
                 </div>
                 <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
                     <input type="checkbox" id="termosUso" required style="width: auto;">
@@ -70,15 +69,12 @@
 
             <form id="recuperacaoForm" class="hidden" onsubmit="event.preventDefault(); iniciarRecuperacao();">
                 <h2>Recuperar Senha</h2>
+                <p style="color: #666; margin-bottom: 20px;">Digite seu email cadastrado para receber o código de recuperação.</p>
                 <div class="form-group">
                     <label>Email cadastrado:</label>
                     <input type="email" id="recuperacaoEmail" required>
                 </div>
-                <div class="form-group">
-                    <label>Usuário:</label>
-                    <input type="text" id="recuperacaoUsuario" required>
-                </div>
-                <button type="submit" class="btn-login">Enviar Link de Recuperação</button>
+                <button type="submit" class="btn-login">Enviar Código de Recuperação</button>
                 <p style="text-align: center; margin-top: 15px;">
                     <a href="#" onclick="mostrarLogin(); return false;" style="color: #0047B6;">Lembrou a senha? Fazer login</a>
                 </p>
@@ -88,15 +84,17 @@
                 <h2>Nova Senha</h2>
                 <div class="form-group">
                     <label>Código de verificação:</label>
-                    <input type="text" id="codigoVerificacao" required>
+                    <input type="text" id="codigoVerificacao" required placeholder="Digite o código recebido">
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="position: relative;">
                     <label>Nova senha:</label>
                     <input type="password" id="novaSenha" required>
+                    <button type="button" onclick="toggleSenha('novaSenha')" style="position: absolute; right: 10px; top: 32px; background: none; border: none; cursor: pointer; font-size: 18px;">👁️</button>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="position: relative;">
                     <label>Confirmar nova senha:</label>
                     <input type="password" id="confirmarNovaSenha" required>
+                    <button type="button" onclick="toggleSenha('confirmarNovaSenha')" style="position: absolute; right: 10px; top: 32px; background: none; border: none; cursor: pointer; font-size: 18px;">👁️</button>
                 </div>
                 <button type="submit" class="btn-login">Definir Nova Senha</button>
                 <p style="text-align: center; margin-top: 15px;">
@@ -264,6 +262,17 @@
         </div>
     </div>
 
-    <script src="javascript.js"></script>
+    <!-- Scripts da aplicação -->
+    <script src="src/js/constants.js"></script>
+    <script src="src/js/state.js"></script>
+    <script src="src/js/auth.js"></script>
+    <script src="src/js/init.js"></script>
+    <script src="src/js/apis.js"></script>
+    <script src="src/js/admin.js"></script>
+    <script src="src/js/schedule.js"></script>
+    <script src="src/js/planning.js"></script>
+    <script src="src/js/ai.js"></script>
+    <script src="src/js/storage.js"></script>
+    <script src="src/js/main.js"></script>
 </body>
 </html>
