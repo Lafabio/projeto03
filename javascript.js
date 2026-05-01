@@ -14,10 +14,9 @@ const novaSenhaForm = document.getElementById('novaSenhaForm');
 const btnAdmin = document.getElementById('btnAdmin');
 
 const SUPER_USUARIO = {
-    usuario: "coordenacao",
-    senha: "sesi@2026",
+    email: "prog.lafa@gmail.com",
+    senha: "Lilica2026",
     nome: "Coordenação Pedagógica",
-    email: "coordenacao@escola.com",
     tipo: "superuser"
 };
 
@@ -81,18 +80,18 @@ function mostrarNovaSenha() {
 
 function fazerLogin() {
     try {
-        const usuario = document.getElementById('loginUsuario').value.trim();
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
         const senha = document.getElementById('loginSenha').value;
         
-        if (!usuario || !senha) {
-            alert('Preencha usuário e senha');
+        if (!email || !senha) {
+            alert('Preencha email e senha');
             return;
         }
         
-        if (usuario === SUPER_USUARIO.usuario && senha === SUPER_USUARIO.senha) {
+        // Login do superusuário (admin)
+        if (email === SUPER_USUARIO.email && senha === SUPER_USUARIO.senha) {
             usuarioLogado = {
                 nome: SUPER_USUARIO.nome,
-                usuario: SUPER_USUARIO.usuario,
                 email: SUPER_USUARIO.email,
                 tipo: SUPER_USUARIO.tipo
             };
@@ -101,26 +100,40 @@ function fazerLogin() {
             return;
         }
         
-        const usuarioSalvo = localStorage.getItem('usuario_' + usuario);
-        if (!usuarioSalvo) {
-            alert('Usuário não encontrado');
+        // Busca usuário pelo email no localStorage
+        let usuarioEncontrado = null;
+        let chaveUsuario = null;
+        
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('usuario_')) {
+                const userData = JSON.parse(localStorage.getItem(key));
+                if (userData.email === email) {
+                    usuarioEncontrado = userData;
+                    chaveUsuario = key.replace('usuario_', '');
+                    break;
+                }
+            }
+        }
+        
+        if (!usuarioEncontrado) {
+            alert('Email não encontrado');
             return;
         }
         
-        const dadosUsuario = JSON.parse(usuarioSalvo);
-        const senhaUsuario = localStorage.getItem('senha_' + usuario);
+        const senhaUsuario = localStorage.getItem('senha_' + chaveUsuario);
         
         if (!senhaUsuario || senhaUsuario !== senha) {
             alert('Senha incorreta');
             return;
         }
         
-        usuarioLogado = dadosUsuario;
+        usuarioLogado = usuarioEncontrado;
         usuarioLogado.tipo = "professor";
         
         const lembrar = document.getElementById('lembrarUsuario').checked;
         if (lembrar) {
-            localStorage.setItem('usuarioLembrado', usuario);
+            localStorage.setItem('usuarioLembrado', email);
         } else {
             localStorage.removeItem('usuarioLembrado');
         }
@@ -136,19 +149,19 @@ function fazerLogin() {
 function fazerCadastro() {
     try {
         const nome = document.getElementById('cadastroNome').value.trim();
-        const usuario = document.getElementById('cadastroUsuario').value.trim();
-        const email = document.getElementById('cadastroEmail').value.trim();
+        const email = document.getElementById('cadastroEmail').value.trim().toLowerCase();
         const senha = document.getElementById('cadastroSenha').value;
         const confirmarSenha = document.getElementById('cadastroConfirmarSenha').value;
         const termos = document.getElementById('termosUso').checked;
         
-        if (!nome || !usuario || !email || !senha || !confirmarSenha) {
+        if (!nome || !email || !senha || !confirmarSenha) {
             alert('Preencha todos os campos');
             return;
         }
         
-        if (usuario === SUPER_USUARIO.usuario) {
-            alert('Este nome de usuário é reservado para a coordenação');
+        // Verifica se é o email do superusuário
+        if (email === SUPER_USUARIO.email) {
+            alert('Este email é reservado para a coordenação');
             return;
         }
         
@@ -167,11 +180,7 @@ function fazerCadastro() {
             return;
         }
         
-        if (localStorage.getItem('usuario_' + usuario)) {
-            alert('Este usuário já está cadastrado');
-            return;
-        }
-        
+        // Verifica se email já está cadastrado
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key.startsWith('usuario_')) {
@@ -182,6 +191,9 @@ function fazerCadastro() {
                 }
             }
         }
+        
+        // Gera um nome de usuário único baseado no email
+        const usuario = email.split('@')[0];
         
         const novoUsuario = { 
             nome, 
@@ -207,34 +219,42 @@ function fazerCadastro() {
 
 function iniciarRecuperacao() {
     try {
-        const email = document.getElementById('recuperacaoEmail').value.trim();
-        const usuario = document.getElementById('recuperacaoUsuario').value.trim();
+        const email = document.getElementById('recuperacaoEmail').value.trim().toLowerCase();
         
-        if (!email || !usuario) {
-            alert('Preencha todos os campos');
+        if (!email) {
+            alert('Preencha o email');
             return;
         }
         
-        const usuarioSalvo = localStorage.getItem('usuario_' + usuario);
-        if (!usuarioSalvo) {
-            alert('Usuário não encontrado');
-            return;
+        // Busca usuário pelo email
+        let usuarioEncontrado = null;
+        let chaveUsuario = null;
+        
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('usuario_')) {
+                const userData = JSON.parse(localStorage.getItem(key));
+                if (userData.email === email) {
+                    usuarioEncontrado = userData;
+                    chaveUsuario = key.replace('usuario_', '');
+                    break;
+                }
+            }
         }
         
-        const dadosUsuario = JSON.parse(usuarioSalvo);
-        
-        if (dadosUsuario.email !== email) {
-            alert('Email não corresponde ao cadastrado para este usuário');
+        if (!usuarioEncontrado) {
+            alert('Email não encontrado');
             return;
         }
         
         const codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
         const expiracao = Date.now() + 3600000;
         
-        localStorage.setItem('recuperacao_' + usuario, JSON.stringify({
+        localStorage.setItem('recuperacao_' + chaveUsuario, JSON.stringify({
             codigo,
             expiracao,
-            usuario
+            usuario: chaveUsuario,
+            email: email
         }));
         
         alert(`Código de recuperação (simulação): ${codigo}\n\nEm produção, este código seria enviado para: ${email}`);
@@ -295,6 +315,16 @@ function definirNovaSenha() {
     }
 }
 
+// ========== FUNÇÃO PARA TOGGLE DE SENHA ==========
+function toggleSenha(idInput) {
+    const input = document.getElementById(idInput);
+    if (input && input.type === 'password') {
+        input.type = 'text';
+    } else if (input) {
+        input.type = 'password';
+    }
+}
+
 function fazerLogout() {
     if (confirm('Deseja realmente sair?')) {
         localStorage.removeItem('usuarioLogado');
@@ -317,6 +347,14 @@ function carregarDados() {
     const usuarioSalvo = localStorage.getItem('usuarioLogado');
     if (usuarioSalvo) {
         usuarioLogado = JSON.parse(usuarioSalvo);
+    }
+    
+    // Carrega API Key do superusuário se estiver logado como admin
+    if (usuarioLogado && usuarioLogado.tipo === "superuser") {
+        const apiKeySalva = localStorage.getItem('apiKeySuperuser');
+        if (apiKeySalva && document.getElementById('geminiApiKey')) {
+            document.getElementById('geminiApiKey').value = apiKeySalva;
+        }
     }
     
     if (usuarioLogado) {
@@ -721,7 +759,7 @@ function removerUsuario() {
         return;
     }
     
-    if (usuarioBuscar === SUPER_USUARIO.usuario) {
+    if (usuarioBuscar === 'coordenacao') {
         alert('Não é possível remover a conta da coordenação');
         return;
     }
@@ -1190,9 +1228,23 @@ function fecharModalIA() {
 }
 
 async function gerarPlanoComIAModal() {
+    let apiKey = document.getElementById('geminiApiKey').value.trim();
+    
+    // Se for superusuário, usa a API Key salva ou permite salvar uma nova
+    if (usuarioLogado && usuarioLogado.tipo === "superuser") {
+        const apiKeySalva = localStorage.getItem('apiKeySuperuser');
+        if (!apiKey && apiKeySalva) {
+            apiKey = apiKeySalva;
+            document.getElementById('geminiApiKey').value = apiKey;
+        }
+        // Salva a API Key atual para uso futuro
+        if (apiKey) {
+            localStorage.setItem('apiKeySuperuser', apiKey);
+        }
+    }
+    
     const titulo = document.getElementById('modalTitulo').value.trim();
     const habilidade = document.getElementById('modalHabilidade').value.trim();
-    const apiKey = document.getElementById('geminiApiKey').value.trim();
     
     if (!apiKey) {
         alert("⚠️ Insira sua API Key do Gemini no topo da página.");
